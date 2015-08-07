@@ -1,0 +1,14 @@
+{
+    "name": "KNS-Support-Client",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.html",
+    "window": {
+        "toolbar": false,
+        "width": 1300,
+        "height": 800
+    },
+    "single-instance": true,
+    "author": "",
+    "license": "ISC"
+}

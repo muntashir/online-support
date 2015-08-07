@@ -1,0 +1,18 @@
+extends layout
+
+block styles
+    link(rel='stylesheet', href='/stylesheets/lobby.css')
+
+block scripts
+    script.
+        sessionID="#{sessionID}";
+    script(src='/javascripts/lobby.js')
+
+block content
+    nav.navbar.navbar-inverse.navbar-fixed-top
+        .container-fluid
+            .navbar-header
+                a.navbar-brand(href="/") #{title}
+    #window
+        .well
+            button.btn.btn-success.button(id="request") Request chat

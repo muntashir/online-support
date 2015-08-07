@@ -1,0 +1,24 @@
+extends layout
+
+block styles
+    link(rel='stylesheet', href='/stylesheets/room.css')
+
+block scripts
+    script.
+        sessionID="#{sessionID}";
+        roomID="#{roomID}";
+    script(src='/javascripts/client.js')
+
+block content
+    nav#nav.navbar.navbar-inverse.navbar-fixed-top
+        .container-fluid
+            .navbar-header
+                a.navbar-brand(href="/") #{title}
+    #chat
+        .panel.panel-primary(id='chat-window')
+            ul.list-group(id='chat-messages')
+        form.form-group(action='' id='chat-form')
+            .input-group
+                input.form-control(type='text' id='chat-input')
+                span.input-group-btn
+                    button.btn.btn-success(id='chat-send') Send
