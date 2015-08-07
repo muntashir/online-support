@@ -23,42 +23,52 @@ win.on('minimize', function () {
 });
 
 $(document).ready(function () {
-    socket = io(server);
+    bootbox.prompt({
+        title: "Please enter the server location",
+        value: "localhost",
+        callback: function (result) {
+            if (result) {
+                server = "http://" + result;
+            }
 
-    socket.emit('request-client-init');
+            socket = io(server);
 
-    socket.on('new-request', function (request) {
-        requests[request] = "";
-        var id = request.split(",")[0];
-        var description = request.split(",")[1];
+            socket.emit('request-client-init');
 
-        var notification = new Notification("New request", {
-            icon: "favicon.png",
-            body: description
-        });
-        notification.onclick = function () {
-            grantRequest(request);
+            socket.on('new-request', function (request) {
+                requests[request] = "";
+                var id = request.split(",")[0];
+                var description = request.split(",")[1];
+
+                var notification = new Notification("New request", {
+                    icon: "favicon.png",
+                    body: description
+                });
+                notification.onclick = function () {
+                    grantRequest(request);
+                }
+
+                notification.onshow = function () {
+                    setTimeout(function () {
+                        notification.close();
+                    }, 10000);
+                }
+
+                renderRequests();
+            });
+
+            socket.on('del-request', function (request) {
+                delete requests[request];
+                renderRequests();
+            });
+
+            socket.on('client-init', function (r) {
+                for (var i = 0; i < r.length; i += 1) {
+                    requests[r[i]] = "";
+                }
+                renderRequests();
+            });
         }
-
-        notification.onshow = function () {
-            setTimeout(function () {
-                notification.close();
-            }, 10000);
-        }
-
-        renderRequests();
-    });
-
-    socket.on('del-request', function (request) {
-        delete requests[request];
-        renderRequests();
-    });
-
-    socket.on('client-init', function (r) {
-        for (var i = 0; i < r.length; i += 1) {
-            requests[r[i]] = "";
-        }
-        renderRequests();
     });
 });
 
