@@ -1,9 +1,11 @@
 var app = require('./app');
+var config = require('./config');
 var redis = require('redis');
 var db = redis.createClient();
 
 //Init HTTP server
-var port = process.env.PORT || 80;
+var port = process.env.PORT || config.port || 80;
+var password = config.password;
 var http = require('http');
 var server = http.createServer(app);
 var io = require('socket.io')(server);
@@ -29,16 +31,20 @@ io.on('connection', function (socket) {
         io.emit('new-request', request);
     });
 
-    socket.on('grant-request', function (request) {
-        db.srem("requests", request);
-        io.emit('del-request', request);
-        io.emit('request-chat-response', request);
+    socket.on('grant-request', function (request, p) {
+        if (p === password) {
+            db.srem("requests", request);
+            io.emit('del-request', request);
+            io.emit('request-chat-response', request);
+        }
     });
 
-    socket.on('request-client-init', function () {
-        db.smembers("requests", function (err, reply) {
-            socket.emit('client-init', reply);
-        });
+    socket.on('request-client-init', function (p) {
+        if (p === password) {
+            db.smembers("requests", function (err, reply) {
+                socket.emit('client-init', reply);
+            });
+        }
     });
 
     socket.on('check-room', function (roomID) {
@@ -51,12 +57,16 @@ io.on('connection', function (socket) {
         });
     });
 
-    socket.on('create-room', function (roomID) {
-        db.sadd("rooms", roomID);
+    socket.on('create-room', function (roomID, p) {
+        if (p === password) {
+            db.sadd("rooms", roomID);
+        }
     });
 
-    socket.on('del-room', function (roomID) {
-        db.srem("rooms", roomID);
+    socket.on('del-room', function (roomID, p) {
+        if (p === password) {
+            db.srem("rooms", roomID);
+        }
     });
 
     socket.on('join-room', function (roomID, sessionID) {
