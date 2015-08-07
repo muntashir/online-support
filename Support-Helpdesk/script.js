@@ -82,4 +82,7 @@ function renderRequests() {
             });
         }
     }
+    if (well.children().length === 0) {
+        well.append("No new requests");
+    }
 }
