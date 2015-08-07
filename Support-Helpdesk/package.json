@@ -1,6 +1,6 @@
 {
-    "name": "KNS-Support-Client",
-    "version": "1.0.0",
+    "name": "KNS-Support-Helpdesk",
+    "version": "1.0.1",
     "description": "",
     "main": "index.html",
     "window": {
