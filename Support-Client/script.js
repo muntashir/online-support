@@ -27,20 +27,23 @@ $(document).ready(function () {
     });
 });
 
-function grantRequest(id) {
+function grantRequest(request) {
+    var id = request.split(",")[0];
     socket.emit('create-room', id);
-    socket.emit('grant-request', id);
+    socket.emit('grant-request', request);
     gui.Shell.openExternal(server + "/rooms/" + id);
 }
 
 function renderRequests() {
     var well = $(".well");
     well.empty();
-    for (var id in requests) {
-        if (requests.hasOwnProperty(id)) {
-            well.append('<button class="btn btn-success button" id="' + id + '">' + id + '</button>');
+    for (var request in requests) {
+        if (requests.hasOwnProperty(request)) {
+            var id = request.split(",")[0];
+            var description = request.split(",")[1];
+            well.append('<button class="btn btn-success button" id="' + id + '">' + description + '</button>');
             $("#" + id).click(function () {
-                grantRequest(id);
+                grantRequest(request);
             });
         }
     }

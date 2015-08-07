@@ -57,3 +57,8 @@ results
 build
 
 node_modules
+*.pak
+*.dll
+*.exe
+*.bin
+Support-Client/credits.html

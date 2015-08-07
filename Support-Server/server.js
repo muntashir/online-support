@@ -24,15 +24,15 @@ io.on('connection', function (socket) {
         });
     });
 
-    socket.on('request-chat', function (id) {
-        db.sadd("requests", id);
-        io.emit('new-request', id);
+    socket.on('request-chat', function (request) {
+        db.sadd("requests", request);
+        io.emit('new-request', request);
     });
 
-    socket.on('grant-request', function (id) {
-        db.srem("requests", id);
-        io.emit('del-request', id);
-        io.emit('request-chat-response', id);
+    socket.on('grant-request', function (request) {
+        db.srem("requests", request);
+        io.emit('del-request', request);
+        io.emit('request-chat-response', request);
     });
 
     socket.on('request-client-init', function () {
