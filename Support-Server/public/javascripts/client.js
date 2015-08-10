@@ -20,6 +20,8 @@ function displayUsersTyping() {
             $('#chat-messages').append(node);
         }
     }
+
+    scrollChat();
 }
 
 function updateWindowTitle() {
@@ -163,5 +165,4 @@ function printToChat(text, active) {
         $('#chat-messages').append('<li class="list-group-item">' + text + '</li>');
     }
     displayUsersTyping();
-    scrollChat();
 }
