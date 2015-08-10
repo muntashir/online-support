@@ -26,6 +26,31 @@ io.on('connection', function (socket) {
         });
     });
 
+    socket.on('check-username', function (username) {
+        var response = true;
+        var roomID = socket.rooms[1];
+        db.lrange(roomID + ":usernames", 0, -1, function (err, d) {
+            for (var i = 0; i < d.length; i += 1) {
+                if (d[i] === username) {
+                    response = false;
+                    socket.emit('check-username-response', response);
+                    return;
+                }
+            }
+            socket.emit('check-username-response', response);
+        });
+    });
+
+    socket.on('start-typing', function (username) {
+        var roomID = socket.rooms[1];
+        socket.broadcast.to(roomID).emit('start-typing', username);
+    });
+
+    socket.on('stop-typing', function (username) {
+        var roomID = socket.rooms[1];
+        socket.broadcast.to(roomID).emit('stop-typing', username);
+    });
+
     socket.on('request-chat', function (request) {
         db.sadd("requests", request);
         io.emit('new-request', request);
@@ -76,11 +101,16 @@ io.on('connection', function (socket) {
 
     socket.on('new-user', function (sessionID, username) {
         var roomID = socket.rooms[1];
-        socket.broadcast.to(roomID).emit('add-user', sessionID);
+        socket.broadcast.to(socket.rooms[1]).emit('chat-message', username + " has joined");
+        db.rpush(roomID + ":usernames", username);
         db.hset("usernames", sessionID, username);
     });
 
-    socket.on('user-leave', function (sessionID, username) {});
+    socket.on('user-leave', function (sessionID, username) {
+        var roomID = socket.rooms[1];
+        db.lrem(roomID + ":usernames", 0, username);
+        socket.broadcast.to(socket.rooms[1]).emit('chat-message', username + " has left");
+    });
 
     socket.on('chat-message', function (msg) {
         socket.broadcast.to(socket.rooms[1]).emit('chat-message', msg);
