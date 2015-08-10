@@ -16,7 +16,8 @@ db.on('connect', function () {
 
 //Init socket
 io.on('connection', function (socket) {
-    socket.on('get-username', function (sessionID) {
+    socket.on('get-username', function () {
+        var sessionID = socket.sessId;
         db.hget("usernames", sessionID, function (err, reply) {
             if (reply) {
                 socket.emit('send-username', reply);
@@ -95,22 +96,30 @@ io.on('connection', function (socket) {
     });
 
     socket.on('join-room', function (roomID, sessionID) {
+        socket.sessId = sessionID;
+        socket.roomId = roomID;
         socket.join(roomID);
         db.sadd(roomID + ":users", sessionID);
     });
 
-    socket.on('new-user', function (sessionID, username) {
+    socket.on('new-user', function (username) {
+        var sessionID = socket.sessId;
         var roomID = socket.rooms[1];
         socket.broadcast.to(roomID).emit('chat-message', username + " has joined");
         db.rpush(roomID + ":usernames", username);
         db.hset("usernames", sessionID, username);
     });
 
-    socket.on('user-leave', function (sessionID, username) {
-        var roomID = socket.rooms[1];
-        db.lrem(roomID + ":usernames", 0, username);
-        socket.broadcast.to(roomID).emit('stop-typing', username);
-        socket.broadcast.to(roomID).emit('chat-message', username + " has left");
+    socket.on('disconnect', function () {
+        var sessionID = socket.sessId;
+        var roomID = socket.roomId;
+        db.hget("usernames", sessionID, function (err, username) {
+            if (username) {
+                db.lrem(roomID + ":usernames", 0, username);
+                io.to(roomID).emit('stop-typing', username);
+                io.to(roomID).emit('chat-message', username + " has left");
+            }
+        });
     });
 
     socket.on('chat-message', function (msg) {
