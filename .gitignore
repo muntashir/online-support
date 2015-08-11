@@ -63,3 +63,4 @@ node_modules
 *.bin
 Support-Client/credits.html
 Support-Helpdesk/credits.html
+Support-Helpdesk/config

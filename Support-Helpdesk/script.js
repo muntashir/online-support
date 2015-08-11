@@ -5,6 +5,7 @@ var requests = {};
 
 var socket;
 
+var fs = require('fs');
 var gui = require('nw.gui');
 var win = gui.Window.get();
 var tray;
@@ -23,7 +24,75 @@ win.on('minimize', function () {
     });
 });
 
+function readFile() {
+    var fileName = "config";
+
+    fs.exists(fileName, function (exists) {
+        if (exists) {
+            fs.stat(fileName, function (error, stats) {
+                fs.open(fileName, "r", function (error, fd) {
+                    var buffer = new Buffer(stats.size);
+
+                    fs.read(fd, buffer, 0, buffer.length, null, function (error, bytesRead, buffer) {
+                        var data = buffer.toString("utf8", 0, buffer.length);
+                        server = data.split(" ")[0];
+                        password = data.split(" ")[1];
+                        fs.close(fd);
+                        connect();
+                    });
+                });
+            });
+        } else {
+            promptIP();
+        }
+    });
+}
+
 $(document).ready(function () {
+    readFile();
+});
+
+function connect() {
+    socket = io(server);
+
+    socket.emit('request-client-init', password);
+
+    socket.on('new-request', function (request) {
+        requests[request] = "";
+        var id = request.split(",")[0];
+        var description = request.split(",")[1];
+
+        var notification = new Notification("New request", {
+            icon: "favicon.png",
+            body: description
+        });
+        notification.onclick = function () {
+            grantRequest(request);
+        }
+
+        notification.onshow = function () {
+            setTimeout(function () {
+                notification.close();
+            }, 10000);
+        }
+
+        renderRequests();
+    });
+
+    socket.on('del-request', function (request) {
+        delete requests[request];
+        renderRequests();
+    });
+
+    socket.on('client-init', function (r) {
+        for (var i = 0; i < r.length; i += 1) {
+            requests[r[i]] = "";
+        }
+        renderRequests();
+    });
+}
+
+function promptIP() {
     bootbox.prompt({
         title: "Please enter the server location",
         value: "localhost",
@@ -40,48 +109,12 @@ $(document).ready(function () {
                         password = result;
                     }
 
-                    socket = io(server);
-
-                    socket.emit('request-client-init', password);
-
-                    socket.on('new-request', function (request) {
-                        requests[request] = "";
-                        var id = request.split(",")[0];
-                        var description = request.split(",")[1];
-
-                        var notification = new Notification("New request", {
-                            icon: "favicon.png",
-                            body: description
-                        });
-                        notification.onclick = function () {
-                            grantRequest(request);
-                        }
-
-                        notification.onshow = function () {
-                            setTimeout(function () {
-                                notification.close();
-                            }, 10000);
-                        }
-
-                        renderRequests();
-                    });
-
-                    socket.on('del-request', function (request) {
-                        delete requests[request];
-                        renderRequests();
-                    });
-
-                    socket.on('client-init', function (r) {
-                        for (var i = 0; i < r.length; i += 1) {
-                            requests[r[i]] = "";
-                        }
-                        renderRequests();
-                    });
+                    connect();
                 }
             });
         }
     });
-});
+}
 
 function grantRequest(request) {
     var id = request.split(",")[0];
