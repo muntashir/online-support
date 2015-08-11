@@ -1,7 +1,17 @@
 var app = require('./app');
 var config = require('./config');
 var redis = require('redis');
-var db = redis.createClient();
+var db;
+
+if (process.env.REDISCLOUD_URL) {
+    var redisURL = require('url').parse(process.env.REDISCLOUD_URL);
+    db = redis.createClient(redisURL.port, redisURL.hostname, {
+        no_ready_check: true
+    });
+    db.auth(redisURL.auth.split(":")[1]);
+} else {
+    db = redis.createClient();
+}
 
 //Init HTTP server
 var port = process.env.PORT || config.port || 80;
