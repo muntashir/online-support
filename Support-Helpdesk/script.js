@@ -5,6 +5,7 @@ var requests = {};
 
 var socket;
 
+var path = require('path');
 var fs = require('fs');
 var gui = require('nw.gui');
 var win = gui.Window.get();
@@ -25,7 +26,7 @@ win.on('minimize', function () {
 });
 
 function readFile() {
-    var fileName = "config";
+    var fileName = path.join(path.dirname(process.execPath), "config");
 
     fs.exists(fileName, function (exists) {
         if (exists) {
