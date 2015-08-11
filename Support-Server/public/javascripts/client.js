@@ -27,9 +27,9 @@
 
     function updateWindowTitle() {
         if (unreadCount) {
-            window.document.title = "KNS Support (" + unreadCount + ")";
+            window.document.title = company + " Support (" + unreadCount + ")";
         } else {
-            window.document.title = "KNS Support";
+            window.document.title = company + " Support";
         }
     }
 
@@ -70,7 +70,7 @@
             if (response) {
                 addUser();
             } else {
-                bootbox.alert("Username is already taken", function () {
+                bootbox.alert("Name is already taken", function () {
                     getUserName();
                 });
             }
@@ -125,7 +125,7 @@
 
     function getUserName() {
         bootbox.prompt({
-            title: "Enter a username",
+            title: "Please enter your name",
             value: "",
             callback: function (result) {
                 if (result === null || result === "") {

@@ -6,13 +6,15 @@ block styles
 block scripts
     script.
         sessionID="#{sessionID}";
+        company="#{company}";
+        prompt="#{prompt}";
     script(src='/javascripts/lobby.js')
 
 block content
-    nav.navbar.navbar-inverse.navbar-fixed-top
+    nav.navbar.navbar-default.navbar-fixed-top
         .container-fluid
             .navbar-header
                 a.navbar-brand(href="/") #{title}
     #window
         .well
-            button.btn.btn-success.button(id="request") Request chat
+            button.btn.btn-default.button(id="request") Request chat

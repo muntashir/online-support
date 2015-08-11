@@ -10,15 +10,15 @@ block scripts
     script(src='/javascripts/client.js')
 
 block content
-    nav#nav.navbar.navbar-inverse.navbar-fixed-top
+    nav#nav.navbar.navbar-default.navbar-fixed-top
         .container-fluid
             .navbar-header
                 a.navbar-brand(href="/") #{title}
     #chat
-        .panel.panel-success(id='chat-window')
+        .panel.panel-default(id='chat-window')
             ul.list-group(id='chat-messages')
-        form.form-group.has-success(action='' id='chat-form')
+        form.form-group(action='' id='chat-form')
             .input-group
                 input.form-control(type='text' id='chat-input')
                 span.input-group-btn
-                    button.btn.btn-success(id='chat-send') Send
+                    button.btn.btn-default(id='chat-send') Send

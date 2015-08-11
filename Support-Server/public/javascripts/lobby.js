@@ -7,7 +7,7 @@
 
         $('#request').click(function () {
             bootbox.prompt({
-                title: "Please describe your issue briefly",
+                title: prompt,
                 value: "",
                 callback: function (result) {
                     if (result !== null && result !== "") {

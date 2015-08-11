@@ -1,5 +1,6 @@
 var server = "http://localhost";
 var password = "";
+var title = "Support Helpdesk";
 
 var requests = {};
 
@@ -38,6 +39,7 @@ function readFile() {
                         var data = buffer.toString("utf8", 0, buffer.length);
                         server = data.split(" ")[0];
                         password = data.split(" ")[1];
+                        title = data.split(" ")[2] + " Support Helpdesk";
                         fs.close(fd);
                         connect();
                     });
@@ -54,6 +56,9 @@ $(document).ready(function () {
 });
 
 function connect() {
+    $("#nav").empty();
+    $("#nav").append(title);
+
     socket = io(server);
 
     socket.emit('request-client-init', password);
@@ -131,7 +136,7 @@ function renderRequests() {
         if (requests.hasOwnProperty(request)) {
             var id = request.split(",")[0];
             var description = request.split(",")[1];
-            well.append('<button class="btn btn-success button" id="' + id + '">' + description + '</button>');
+            well.append('<button class="btn btn-default button" id="' + id + '">' + description + '</button>');
             $("#" + id).click(function () {
                 grantRequest(request);
             });
