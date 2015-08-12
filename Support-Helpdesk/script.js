@@ -12,6 +12,8 @@ var gui = require('nw.gui');
 var win = gui.Window.get();
 var tray;
 
+win.title = title;
+
 win.on('minimize', function () {
     this.hide();
 
@@ -26,6 +28,10 @@ win.on('minimize', function () {
     });
 });
 
+if (gui.App.argv[0] && gui.App.argv[0] === "-m") {
+    win.minimize();
+}
+
 function readFile() {
     var fileName = path.join(path.dirname(process.execPath), "config");
 
@@ -37,9 +43,10 @@ function readFile() {
 
                     fs.read(fd, buffer, 0, buffer.length, null, function (error, bytesRead, buffer) {
                         var data = buffer.toString("utf8", 0, buffer.length);
-                        server = data.split(" ")[0];
-                        password = data.split(" ")[1];
-                        title = data.split(" ")[2] + " Support Helpdesk";
+                        server = data.split("|")[0];
+                        password = data.split("|")[1];
+                        title = data.split("|")[2] + " Support Helpdesk";
+                        win.title = title;
                         fs.close(fd);
                         connect();
                     });
