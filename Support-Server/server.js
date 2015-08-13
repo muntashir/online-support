@@ -128,6 +128,11 @@ io.on('connection', function (socket) {
                 db.lrem(roomID + ":usernames", 0, username);
                 io.to(roomID).emit('stop-typing', username);
                 io.to(roomID).emit('chat-message', username + " has left");
+                db.llen(roomID + ":usernames", function (err, reply) {
+                    if (!reply) {
+                        db.srem("rooms", roomID);
+                    }
+                });
             }
         });
     });
