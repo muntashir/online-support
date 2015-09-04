@@ -21,7 +21,9 @@ var server = http.createServer(app);
 var io = require('socket.io')(server);
 
 db.on('connect', function () {
-    console.log('Connected to Redis');
+    db.del('requests');
+    db.del('usernames');
+    db.del('rooms');
 });
 
 //Init socket
@@ -64,6 +66,8 @@ io.on('connection', function (socket) {
 
     socket.on('request-chat', function (request) {
         db.sadd("requests", request);
+        socket.pendingRequest = true;
+        socket.sessId = request;
         io.emit('new-request', request);
     });
 
@@ -123,6 +127,12 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         var sessionID = socket.sessId;
         var roomID = socket.roomId;
+
+        if (socket.pendingRequest) {
+            db.srem("requests", sessionID);
+            return;
+        }
+
         db.hget("usernames", sessionID, function (err, username) {
             if (username) {
                 db.lrem(roomID + ":usernames", 0, username);
