@@ -41,7 +41,7 @@
                 socket.emit('join-room', roomID, sessionID);
                 initChat();
             } else {
-                bootbox.alert("Room does not exist", function () {
+                bootbox.alert("Error connecting. Please go back and submit another request.", function () {
                     window.location = "/";
                 });
             }
